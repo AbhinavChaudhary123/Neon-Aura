@@ -3231,3 +3231,442 @@ main {
     display: none !important;
   }
 }
+
+/* =========================================================
+   NEON AURA — FINAL PLAYER
+   Desktop + Tablet + Mobile
+   ========================================================= */
+
+.player {
+  position: fixed !important;
+  left: 250px !important;
+  right: 0 !important;
+  bottom: 0 !important;
+
+  width: auto !important;
+  height: 92px !important;
+  min-height: 92px !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(190px, 260px) minmax(300px, 1fr) auto !important;
+
+  align-items: center !important;
+  gap: 20px !important;
+
+  padding: 10px 22px !important;
+
+  z-index: 2000 !important;
+  box-sizing: border-box !important;
+
+  background: rgba(10, 11, 27, 0.98) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ---------- CURRENT SONG ---------- */
+
+.player .now {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  gap: 11px !important;
+
+  overflow: hidden !important;
+}
+
+.player .now img {
+  width: 58px !important;
+  height: 58px !important;
+
+  flex: 0 0 58px !important;
+
+  object-fit: cover !important;
+  border-radius: 9px !important;
+}
+
+.player .now > div {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.player .now b,
+.player .now span {
+  display: block !important;
+
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.player .now b {
+  font-size: 13px;
+}
+
+.player .now span {
+  margin-top: 4px;
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+/* ---------- CONTROLS ---------- */
+
+.player .controls {
+  width: 100% !important;
+  min-width: 0 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 5px !important;
+}
+
+.player .main-controls {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 7px !important;
+}
+
+.player .controls button,
+.player .actions button {
+  border: 0 !important;
+  background: transparent !important;
+  color: inherit;
+
+  cursor: pointer;
+
+  display: grid !important;
+  place-items: center !important;
+
+  width: 34px !important;
+  height: 34px !important;
+
+  padding: 0 !important;
+  border-radius: 50% !important;
+}
+
+.player .controls button:hover,
+.player .actions button:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.player .controls button.active {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* PLAY BUTTON */
+
+.player .controls .play {
+  width: 42px !important;
+  height: 42px !important;
+
+  background: white !important;
+  color: #111 !important;
+}
+
+.player .controls .play:hover {
+  background: #eee !important;
+}
+
+/* ---------- TIMELINE ---------- */
+
+.player .timeline {
+  width: min(560px, 100%) !important;
+  min-width: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+
+  gap: 8px !important;
+}
+
+.player .timeline span {
+  width: 34px !important;
+
+  font-size: 9px !important;
+  text-align: center !important;
+
+  opacity: 0.55;
+  flex: 0 0 34px;
+}
+
+.player .timeline input {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+/* ---------- RIGHT ACTIONS ---------- */
+
+.player .actions {
+  width: auto !important;
+  min-width: 150px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+
+  gap: 8px !important;
+}
+
+.player .actions input {
+  width: 80px !important;
+}
+
+.player .player-action {
+  display: grid !important;
+  place-items: center !important;
+
+  width: 32px !important;
+  height: 32px !important;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+  main,
+  .app main {
+    width: calc(100% - 76px);
+    margin-left: 76px;
+    padding-bottom: 130px;
+  }
+
+  .player {
+    left: 76px !important;
+
+    grid-template-columns:
+      minmax(150px, 210px)
+      minmax(240px, 1fr)
+      auto !important;
+
+    gap: 12px !important;
+    padding: 9px 14px !important;
+  }
+
+  .player .now img {
+    width: 52px !important;
+    height: 52px !important;
+    flex-basis: 52px !important;
+  }
+
+  .player .actions {
+    min-width: auto !important;
+  }
+
+  .player .actions input {
+    width: 60px !important;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .app {
+    padding-bottom: 160px !important;
+  }
+
+  .player {
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 64px !important;
+
+    width: 100% !important;
+
+    height: 92px !important;
+    min-height: 92px !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto !important;
+
+    grid-template-rows:
+      1fr
+      16px !important;
+
+    gap: 0 6px !important;
+
+    padding: 7px 10px 5px !important;
+
+    z-index: 2050 !important;
+  }
+
+  /* SONG */
+
+  .player .now {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    height: 48px !important;
+  }
+
+  .player .now img {
+    width: 48px !important;
+    height: 48px !important;
+    flex: 0 0 48px !important;
+  }
+
+  .player .now b {
+    font-size: 12px !important;
+  }
+
+  .player .now span {
+    font-size: 10px !important;
+  }
+
+  /* CONTROLS */
+
+  .player .controls {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+
+    height: 48px !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+
+    align-items: center !important;
+    justify-content: flex-end !important;
+
+    gap: 0 !important;
+  }
+
+  .player .main-controls {
+    gap: 0 !important;
+  }
+
+  .player .controls button {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .player .controls .play {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  /* MOBILE TIMELINE */
+
+  .player .timeline {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+
+    position: static !important;
+
+    width: 100% !important;
+    height: 12px !important;
+
+    display: flex !important;
+
+    gap: 4px !important;
+  }
+
+  .player .timeline span {
+    display: none !important;
+  }
+
+  .player .timeline input {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* IMPORTANT:
+     ACTIONS MUST STAY AVAILABLE FOR QUEUE
+  */
+
+  .player .actions {
+    display: flex !important;
+
+    position: absolute !important;
+
+    right: 5px !important;
+    top: 5px !important;
+
+    width: 30px !important;
+    min-width: 30px !important;
+
+    height: 30px !important;
+
+    z-index: 10 !important;
+  }
+
+  /* Hide:
+     Like
+     Volume icon
+     Volume slider
+     Chevron
+  */
+
+  .player .actions .player-action:first-child,
+  .player .actions > svg,
+  .player .actions input {
+    display: none !important;
+  }
+
+  /* Queue button = last button */
+
+  .player .actions .player-action:last-child {
+    display: grid !important;
+
+    width: 30px !important;
+    height: 30px !important;
+
+    background: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .player .actions .player-action:last-child:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+  }
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 380px) {
+
+  .player {
+    padding-left: 7px !important;
+    padding-right: 7px !important;
+  }
+
+  .player .now img {
+    width: 44px !important;
+    height: 44px !important;
+    flex-basis: 44px !important;
+  }
+
+  .player .now b {
+    font-size: 11px !important;
+  }
+
+  .player .controls button {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .player .controls .play {
+    width: 36px !important;
+    height: 36px !important;
+  }
+}

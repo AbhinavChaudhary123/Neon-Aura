@@ -32,9 +32,9 @@ export function PlayerProvider({ children }) {
   const shuffleRef = useRef(false);
   const repeatRef = useRef(false);
 
-  /* -----------------------------
+  /* =====================================================
      KEEP REFS UPDATED
-  ----------------------------- */
+     ===================================================== */
 
   useEffect(() => {
     queueRef.current = queue;
@@ -56,9 +56,9 @@ export function PlayerProvider({ children }) {
     audio.volume = volume;
   }, [audio, volume]);
 
-  /* -----------------------------
+  /* =====================================================
      PLAY SONG
-  ----------------------------- */
+     ===================================================== */
 
   const playSong = (
     song,
@@ -71,13 +71,15 @@ export function PlayerProvider({ children }) {
     }
 
     const newQueue =
-      list && list.length > 0 ? list : [song];
+      list && list.length > 0
+        ? [...list]
+        : [song];
 
     let newIndex = songIndex;
 
     if (newIndex < 0) {
       newIndex = newQueue.findIndex(
-        (item) => item._id === song._id
+        (item) => item?._id === song?._id
       );
     }
 
@@ -99,7 +101,6 @@ export function PlayerProvider({ children }) {
     audio.pause();
 
     audio.src = song.audioUrl;
-
     audio.load();
 
     audio
@@ -108,26 +109,34 @@ export function PlayerProvider({ children }) {
         setPlaying(true);
       })
       .catch((error) => {
-        console.error("Audio play failed:", error);
+        console.error(
+          "Audio play failed:",
+          error
+        );
+
         setPlaying(false);
       });
 
+    /* Record play */
     api
       .post(`/songs/${song._id}/play`)
       .catch(() => {});
   };
 
-  /* -----------------------------
+  /* =====================================================
      LOAD
-  ----------------------------- */
+     ===================================================== */
 
-  const load = (song, list = queueRef.current) => {
+  const load = (
+    song,
+    list = queueRef.current
+  ) => {
     playSong(song, list);
   };
 
-  /* -----------------------------
+  /* =====================================================
      PLAY / PAUSE
-  ----------------------------- */
+     ===================================================== */
 
   const toggle = () => {
     if (!current) return;
@@ -144,35 +153,28 @@ export function PlayerProvider({ children }) {
         setPlaying(true);
       })
       .catch((error) => {
-        console.error("Resume failed:", error);
+        console.error(
+          "Resume failed:",
+          error
+        );
+
         setPlaying(false);
       });
   };
 
-  /* -----------------------------
+  /* =====================================================
      NEXT
-  ----------------------------- */
+     ===================================================== */
 
   const next = () => {
     const list = queueRef.current;
 
     if (!list || list.length === 0) {
-      console.log("Queue is empty");
       return;
     }
 
-    let nextIndex;
-
-    if (shuffleRef.current && list.length > 1) {
-      do {
-        nextIndex = Math.floor(
-          Math.random() * list.length
-        );
-      } while (nextIndex === indexRef.current);
-    } else {
-      nextIndex =
-        (indexRef.current + 1) % list.length;
-    }
+    const nextIndex =
+      (indexRef.current + 1) % list.length;
 
     playSong(
       list[nextIndex],
@@ -181,17 +183,21 @@ export function PlayerProvider({ children }) {
     );
   };
 
-  /* -----------------------------
+  /* =====================================================
      PREVIOUS
-  ----------------------------- */
+     ===================================================== */
 
   const prev = () => {
     const list = queueRef.current;
 
     if (!list || list.length === 0) {
-      console.log("Queue is empty");
       return;
     }
+
+    /*
+      If current song has played more than
+      3 seconds, restart it.
+    */
 
     if (audio.currentTime > 3) {
       audio.currentTime = 0;
@@ -210,51 +216,156 @@ export function PlayerProvider({ children }) {
     );
   };
 
-  /* -----------------------------
+  /* =====================================================
      SEEK
-  ----------------------------- */
+     ===================================================== */
 
   const seek = (value) => {
     const time = Number(value);
 
-    if (!Number.isFinite(time)) return;
+    if (!Number.isFinite(time)) {
+      return;
+    }
 
     audio.currentTime = time;
     setProgress(time);
   };
 
-  /* -----------------------------
+  /* =====================================================
      VOLUME
-  ----------------------------- */
+     ===================================================== */
 
   const handleVolume = (value) => {
     const newVolume = Number(value);
 
-    if (!Number.isFinite(newVolume)) return;
+    if (!Number.isFinite(newVolume)) {
+      return;
+    }
 
-    setVolume(newVolume);
-    audio.volume = newVolume;
+    const safeVolume = Math.min(
+      1,
+      Math.max(0, newVolume)
+    );
+
+    setVolume(safeVolume);
+    audio.volume = safeVolume;
   };
 
-  /* -----------------------------
+  /* =====================================================
      SHUFFLE
-  ----------------------------- */
+     ===================================================== */
 
   const toggleShuffle = () => {
-    setShuffle((value) => !value);
+    const currentlyShuffled =
+      shuffleRef.current;
+
+    /* ---------------------------------------------
+       TURN SHUFFLE OFF
+       --------------------------------------------- */
+
+    if (currentlyShuffled) {
+      setShuffle(false);
+      shuffleRef.current = false;
+
+      return;
+    }
+
+    const list = [...queueRef.current];
+
+    if (list.length <= 1) {
+      setShuffle(true);
+      shuffleRef.current = true;
+
+      return;
+    }
+
+    const currentIndex =
+      indexRef.current;
+
+    const currentSong =
+      list[currentIndex];
+
+    if (!currentSong) {
+      setShuffle(true);
+      shuffleRef.current = true;
+
+      return;
+    }
+
+    /*
+      Remove current song.
+      It stays at the front of
+      the shuffled queue.
+    */
+
+    const remainingSongs = list.filter(
+      (_, i) => i !== currentIndex
+    );
+
+    /*
+      Fisher-Yates shuffle
+    */
+
+    for (
+      let i = remainingSongs.length - 1;
+      i > 0;
+      i--
+    ) {
+      const randomIndex =
+        Math.floor(
+          Math.random() * (i + 1)
+        );
+
+      [
+        remainingSongs[i],
+        remainingSongs[randomIndex],
+      ] = [
+        remainingSongs[randomIndex],
+        remainingSongs[i],
+      ];
+    }
+
+    /*
+      Current song first,
+      everything else shuffled.
+    */
+
+    const shuffledQueue = [
+      currentSong,
+      ...remainingSongs,
+    ];
+
+    setQueue(shuffledQueue);
+    queueRef.current = shuffledQueue;
+
+    /*
+      Current song is now index 0.
+    */
+
+    setIndex(0);
+    indexRef.current = 0;
+
+    setShuffle(true);
+    shuffleRef.current = true;
   };
 
-  /* -----------------------------
+  /* =====================================================
      REPEAT
-  ----------------------------- */
+     ===================================================== */
 
   const toggleRepeat = () => {
-    setRepeat((value) => !value);
+    setRepeat((value) => {
+      const newValue = !value;
+
+      repeatRef.current = newValue;
+
+      return newValue;
+    });
   };
 
-  /* -----------------------------
+  /* =====================================================
      AUDIO EVENTS
-  ----------------------------- */
+     ===================================================== */
 
   useEffect(() => {
     const handleTimeUpdate = () => {
@@ -262,60 +373,48 @@ export function PlayerProvider({ children }) {
     };
 
     const handleLoadedMetadata = () => {
-      setDuration(
+      const audioDuration =
         Number.isFinite(audio.duration)
           ? audio.duration
-          : 0
-      );
+          : 0;
+
+      setDuration(audioDuration);
     };
 
     const handleEnded = () => {
       const list = queueRef.current;
 
-      if (!list.length) {
+      if (!list || list.length === 0) {
         setPlaying(false);
         return;
       }
 
-      /* Repeat */
+      /* ---------------------------------------------
+         REPEAT CURRENT SONG
+         --------------------------------------------- */
+
       if (repeatRef.current) {
         audio.currentTime = 0;
 
         audio
           .play()
-          .then(() => setPlaying(true))
-          .catch(() => setPlaying(false));
+          .then(() => {
+            setPlaying(true);
+          })
+          .catch(() => {
+            setPlaying(false);
+          });
 
         return;
       }
 
-      /* Shuffle */
-      if (
-        shuffleRef.current &&
-        list.length > 1
-      ) {
-        let randomIndex;
+      /* ---------------------------------------------
+         NORMAL / SHUFFLED NEXT
+         --------------------------------------------- */
 
-        do {
-          randomIndex = Math.floor(
-            Math.random() * list.length
-          );
-        } while (
-          randomIndex === indexRef.current
-        );
-
-        playSong(
-          list[randomIndex],
-          list,
-          randomIndex
-        );
-
-        return;
-      }
-
-      /* Normal next */
       const nextIndex =
-        (indexRef.current + 1) % list.length;
+        (indexRef.current + 1) %
+        list.length;
 
       playSong(
         list[nextIndex],
@@ -354,19 +453,21 @@ export function PlayerProvider({ children }) {
         "ended",
         handleEnded
       );
+
+      audio.pause();
     };
   }, [audio]);
 
-  /* -----------------------------
+  /* =====================================================
      CONTEXT
-  ----------------------------- */
+     ===================================================== */
 
   return (
     <C.Provider
       value={{
         current,
 
-        /* Compatibility with old Player */
+        /* Compatibility */
         song: current,
 
         playing,
